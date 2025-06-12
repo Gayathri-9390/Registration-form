@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Registered Users</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 90%;
+      margin: 20px auto;
+    }
+
+    th, td {
+      border: 1px solid #aaa;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    h2, .center {
+      text-align: center;
+    }
+
+    .form-popup {
+      display: none;
+      position: fixed;
+      top: 20%;
+      left: 30%;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      padding: 20px;
+      z-index: 999;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
+    }
+
+    .form-popup input {
+      display: block;
+      margin-bottom: 10px;
+      width: 100%;
+      padding: 6px;
+    }
+
+    button {
+      padding: 5px 10px;
+      margin: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>All Registered Users</h2>
+  <table id="userTable">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Full Name</th>
+        <th>Email</th>
+        <th>Password</th>
+        <th>Gender</th>
+        <th>DOB</th>
+        <th>Phone</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="center">
+    <button onclick="clearAllData()">Clear All Data</button>
+  </div>
+
+  <!-- Edit Form Popup -->
+  <div class="form-popup" id="editForm">
+    <h3>Edit User</h3>
+    <input type="text" id="editFullname" placeholder="Full Name">
+    <input type="email" id="editEmail" placeholder="Email">
+    <input type="password" id="editPassword" placeholder="Password">
+    <input type="text" id="editGender" placeholder="Gender">
+    <input type="date" id="editDob">
+    <input type="tel" id="editPhone" placeholder="Phone">
+
+    <button onclick="saveEdit()">Save</button>
+    <button onclick="closeEditForm()">Cancel</button>
+  </div>
+
+  <script>
+    let editIndex = null;
+
+    function loadData() {
+      const userTableBody = document.querySelector("#userTable tbody");
+      userTableBody.innerHTML = "";
+      const allUsers = JSON.parse(localStorage.getItem("allUsers")) || [];
+
+      if (allUsers.length === 0) {
+        userTableBody.innerHTML = `<tr><td colspan="8" class="center">No registrations found</td></tr>`;
+        return;
+      }
+
+      allUsers.forEach((user, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${user.fullname}</td>
+          <td>${user.email}</td>
+          <td>${"*".repeat(user.password.length)}</td>
+          <td>${user.gender}</td>
+          <td>${user.dob}</td>
+          <td>${user.phone}</td>
+          <td>
+            <button onclick="editUser(${index})">Edit</button>
+            <button onclick="deleteUser(${index})">Delete</button>
+          </td>
+        `;
+        userTableBody.appendChild(row);
+      });
+    }
+
+    function deleteUser(index) {
+      let allUsers = JSON.parse(localStorage.getItem("allUsers")) || [];
+      if (confirm("Are you sure you want to delete this user?")) {
+        allUsers.splice(index, 1);
+        localStorage.setItem("allUsers", JSON.stringify(allUsers));
+        loadData();
+      }
+    }
+
+    function clearAllData() {
+      if (confirm("Are you sure you want to delete ALL user data?")) {
+        localStorage.removeItem("allUsers");
+        loadData();
+      }
+    }
+
+    function editUser(index) {
+      const allUsers = JSON.parse(localStorage.getItem("allUsers")) || [];
+      const user = allUsers[index];
+      editIndex = index;
+
+      document.getElementById("editFullname").value = user.fullname;
+      document.getElementById("editEmail").value = user.email;
+      document.getElementById("editPassword").value = user.password;
+      document.getElementById("editGender").value = user.gender;
+      document.getElementById("editDob").value = user.dob;
+      document.getElementById("editPhone").value = user.phone;
+
+      document.getElementById("editForm").style.display = "block";
+    }
+
+    function saveEdit() {
+      let allUsers = JSON.parse(localStorage.getItem("allUsers")) || [];
+
+      const updatedUser = {
+        fullname: document.getElementById("editFullname").value,
+        email: document.getElementById("editEmail").value,
+        password: document.getElementById("editPassword").value,
+        gender: document.getElementById("editGender").value,
+        dob: document.getElementById("editDob").value,
+        phone: document.getElementById("editPhone").value,
+      };
+
+      allUsers[editIndex] = updatedUser;
+      localStorage.setItem("allUsers", JSON.stringify(allUsers));
+
+      closeEditForm();
+      loadData();
+    }
+
+    function closeEditForm() {
+      document.getElementById("editForm").style.display = "none";
+      editIndex = null;
+    }
+
+    // Load data initially
+    loadData();
+  </script>
+</body>
+</html>

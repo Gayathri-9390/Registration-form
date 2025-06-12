@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Registration Form</title>
+</head>
+<body>
+  <h2>Registration Form</h2>
+
+  <form id="registrationForm">
+    <label>Full Name:</label><br>
+    <input type="text" id="fullname" required><br><br>
+
+    <label>Email:</label><br>
+    <input type="email" id="email" required><br><br>
+
+    <label>Password:</label><br>
+    <input type="password" id="password" required><br><br>
+
+    <label>Gender:</label><br>
+    <input type="radio" name="gender" value="Male" required> Male
+    <input type="radio" name="gender" value="Female"> Female
+    <input type="radio" name="gender" value="Other"> Other<br><br>
+
+    <label>Date of Birth:</label><br>
+    <input type="date" id="dob" required><br><br>
+
+    <label>Phone:</label><br>
+    <input type="tel" id="phone" pattern="[0-9]{10}" required><br><br>
+
+    <button type="submit">Register</button>
+    <button type="button" onclick="window.open('display.html', '_blank')">View All Registrations</button>
+  </form>
+
+  <script>
+    document.getElementById("registrationForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const userData = {
+        fullname: document.getElementById("fullname").value,
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value,
+        gender: document.querySelector('input[name="gender"]:checked').value,
+        dob: document.getElementById("dob").value,
+        phone: document.getElementById("phone").value,
+      };
+
+      let allUsers = JSON.parse(localStorage.getItem("allUsers")) || [];
+      allUsers.push(userData);
+      localStorage.setItem("allUsers", JSON.stringify(allUsers));
+
+      alert("Registration Successful!");
+      document.getElementById("registrationForm").reset();
+    });
+  </script>
+</body>
+</html>
